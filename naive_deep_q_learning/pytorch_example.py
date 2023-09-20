@@ -19,9 +19,7 @@ class LinearClassifier(nn.Module):
     def forward(self, data):
         layer1 = F.sigmoid(self.fc1(data))
         layer2 = F.sigmoid(self.fc2(layer1))
-        layer3 = self.fc3(layer2)
-
-        return layer3
+        return self.fc3(layer2)
 
     def learn(self, data, labels):
         self.optimizer.zero_grad()

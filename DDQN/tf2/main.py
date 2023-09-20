@@ -20,9 +20,8 @@ if __name__ == '__main__':
         agent.load_models()
         agent.epsilon = agent.eps_min
 
-    fname = agent.algo + '_' + agent.env_name + '_lr' + str(agent.lr) + '_' \
-        + str(n_games) + 'games'
-    figure_file = 'plots/' + fname + '.png'
+    fname = f'{agent.algo}_{agent.env_name}_lr{str(agent.lr)}_{n_games}games'
+    figure_file = f'plots/{fname}.png'
     # if you want to record video of your agent playing, do a
     # mkdir video
     if record_agent:

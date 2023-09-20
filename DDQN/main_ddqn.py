@@ -18,9 +18,8 @@ if __name__ == '__main__':
     if load_checkpoint:
         agent.load_models()
 
-    fname = agent.algo + '_' + agent.env_name + '_lr' + str(agent.lr) +'_' \
-            + str(n_games) + 'games'
-    figure_file = 'plots/' + fname + '.png'
+    fname = f'{agent.algo}_{agent.env_name}_lr{str(agent.lr)}_{n_games}games'
+    figure_file = f'plots/{fname}.png'
 
     n_steps = 0
     scores, eps_history, steps_array = [], [], []

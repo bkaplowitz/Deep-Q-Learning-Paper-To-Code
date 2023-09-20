@@ -75,10 +75,9 @@ if __name__ == '__main__':
     if args.load_checkpoint:
         agent.load_models()
 
-    fname = args.algo + '_' + args.env + '_alpha' + str(args.lr) +'_' \
-            + str(args.n_games) + 'games'
-    figure_file = 'plots/' + fname + '.png'
-    scores_file = fname + '_scores.npy'
+    fname = f'{args.algo}_{args.env}_alpha{str(args.lr)}_{str(args.n_games)}games'
+    figure_file = f'plots/{fname}.png'
+    scores_file = f'{fname}_scores.npy'
 
     scores, eps_history = [], []
     n_steps = 0
