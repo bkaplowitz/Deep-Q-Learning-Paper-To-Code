@@ -20,9 +20,7 @@ class LinearDeepQNetwork(nn.Module):
 
     def forward(self, state):
         layer1 = F.relu(self.fc1(state))
-        actions = self.fc2(layer1)
-
-        return actions
+        return self.fc2(layer1)
 
 
 class Agent():
@@ -35,19 +33,17 @@ class Agent():
         self.epsilon = epsilon
         self.eps_dec = eps_dec
         self.eps_min = eps_min
-        self.action_space = [i for i in range(self.n_actions)]
+        self.action_space = list(range(self.n_actions))
 
         self.Q = LinearDeepQNetwork(self.lr, self.n_actions, self.input_dims)
 
     def choose_action(self, observation):
-        if np.random.random() > self.epsilon:
-            state = T.tensor(observation, dtype=T.float).to(self.Q.device)
-            actions = self.Q.forward(state)
-            action = T.argmax(actions).item()
-        else:
-            action = np.random.choice(self.action_space)
+        if np.random.random() <= self.epsilon:
+            return np.random.choice(self.action_space)
 
-        return action
+        state = T.tensor(observation, dtype=T.float).to(self.Q.device)
+        actions = self.Q.forward(state)
+        return T.argmax(actions).item()
 
     def decrement_epsilon(self):
         self.epsilon = self.epsilon - self.eps_dec \

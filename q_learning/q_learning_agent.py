@@ -22,12 +22,10 @@ class Agent():
 
     def choose_action(self, state):
         if np.random.random() < self.epsilon:
-            action = np.random.choice([i for i in range(self.n_actions)])
-        else:
-            actions = np.array([self.Q[(state, a)] \
+            return np.random.choice(list(range(self.n_actions)))
+        actions = np.array([self.Q[(state, a)] \
                                 for a in range(self.n_actions)])
-            action = np.argmax(actions)
-        return action
+        return np.argmax(actions)
 
     def decrement_epsilon(self):
         self.epsilon = self.epsilon*self.eps_dec if self.epsilon>self.eps_min\

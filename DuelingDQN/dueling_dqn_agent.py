@@ -19,19 +19,25 @@ class DuelingDQNAgent(object):
         self.algo = algo
         self.env_name = env_name
         self.chkpt_dir = chkpt_dir
-        self.action_space = [i for i in range(n_actions)]
+        self.action_space = list(range(n_actions))
         self.learn_step_counter = 0
 
         self.memory = ReplayBuffer(mem_size, input_dims, n_actions)
 
-        self.q_eval = DuelingDeepQNetwork(self.lr, self.n_actions,
-                        input_dims=self.input_dims,
-                        name=self.env_name+'_'+self.algo+'_q_eval',
-                        chkpt_dir=self.chkpt_dir)
-        self.q_next = DuelingDeepQNetwork(self.lr, self.n_actions,
-                        input_dims=self.input_dims,
-                        name=self.env_name+'_'+self.algo+'_q_next',
-                        chkpt_dir=self.chkpt_dir)
+        self.q_eval = DuelingDeepQNetwork(
+            self.lr,
+            self.n_actions,
+            input_dims=self.input_dims,
+            name=f'{self.env_name}_{self.algo}_q_eval',
+            chkpt_dir=self.chkpt_dir,
+        )
+        self.q_next = DuelingDeepQNetwork(
+            self.lr,
+            self.n_actions,
+            input_dims=self.input_dims,
+            name=f'{self.env_name}_{self.algo}_q_next',
+            chkpt_dir=self.chkpt_dir,
+        )
 
     def store_transition(self, state, action, reward, state_, done):
         self.memory.store_transition(state, action, reward, state_, done)
@@ -49,14 +55,12 @@ class DuelingDQNAgent(object):
         return states, actions, rewards, states_, dones
 
     def choose_action(self, observation):
-        if np.random.random() > self.epsilon:
-            state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
-            _, advantage = self.q_eval.forward(state)
-            action = T.argmax(advantage).item()
-        else:
-            action = np.random.choice(self.action_space)
+        if np.random.random() <= self.epsilon:
+            return np.random.choice(self.action_space)
 
-        return action
+        state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
+        _, advantage = self.q_eval.forward(state)
+        return T.argmax(advantage).item()
 
     def replace_target_network(self):
         if self.replace_target_cnt is not None and \

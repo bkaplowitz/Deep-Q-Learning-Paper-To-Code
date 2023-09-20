@@ -22,7 +22,7 @@ class Agent:
         self.algo = algo
         self.env_name = env_name
         self.chkpt_dir = chkpt_dir
-        self.action_space = [i for i in range(n_actions)]
+        self.action_space = list(range(n_actions))
         self.learn_step_counter = 0
         self.fname = self.chkpt_dir + self.env_name + '_' + self.algo + '_'
 
@@ -34,13 +34,13 @@ class Agent:
         self.q_next.compile(optimizer=Adam(learning_rate=lr))
 
     def save_models(self):
-        self.q_eval.save(self.fname+'q_eval')
-        self.q_next.save(self.fname+'q_next')
+        self.q_eval.save(f'{self.fname}q_eval')
+        self.q_next.save(f'{self.fname}q_next')
         print('... models saved successfully ...')
 
     def load_models(self):
-        self.q_eval = keras.models.load_model(self.fname+'q_eval')
-        self.q_next = keras.models.load_model(self.fname+'q_next')
+        self.q_eval = keras.models.load_model(f'{self.fname}q_eval')
+        self.q_next = keras.models.load_model(f'{self.fname}q_next')
         print('... models loaded successfully ...')
 
     def store_transition(self, state, action, reward, state_, done):
@@ -57,13 +57,11 @@ class Agent:
         return states, actions, rewards, states_, dones
 
     def choose_action(self, observation):
-        if np.random.random() > self.epsilon:
-            state = tf.convert_to_tensor([observation])
-            actions = self.q_eval(state)
-            action = tf.math.argmax(actions, axis=1).numpy()[0]
-        else:
-            action = np.random.choice(self.action_space)
-        return action
+        if np.random.random() <= self.epsilon:
+            return np.random.choice(self.action_space)
+        state = tf.convert_to_tensor([observation])
+        actions = self.q_eval(state)
+        return tf.math.argmax(actions, axis=1).numpy()[0]
 
     def replace_target_network(self):
         if self.learn_step_counter % self.replace_target_cnt == 0:

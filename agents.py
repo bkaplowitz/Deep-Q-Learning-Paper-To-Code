@@ -14,7 +14,7 @@ class Agent():
         self.input_dims = input_dims
         self.eps_min = eps_min
         self.eps_dec = eps_dec
-        self.action_space = [i for i in range(n_actions)]
+        self.action_space = list(range(n_actions))
         self.learn_step_counter = 0
         self.batch_size = batch_size
         self.replace_target_cnt = replace
@@ -64,24 +64,28 @@ class DQNAgent(Agent):
     def __init__(self, *args, **kwargs):
         super(DQNAgent, self).__init__(*args, **kwargs)
 
-        self.q_eval = DeepQNetwork(self.lr, self.n_actions,
-                                    input_dims=self.input_dims,
-                                    name=self.env_name+'_'+self.algo+'_q_eval',
-                                    chkpt_dir=self.chkpt_dir)
-        self.q_next = DeepQNetwork(self.lr, self.n_actions,
-                                    input_dims=self.input_dims,
-                                    name=self.env_name+'_'+self.algo+'_q_next',
-                                    chkpt_dir=self.chkpt_dir)
+        self.q_eval = DeepQNetwork(
+            self.lr,
+            self.n_actions,
+            input_dims=self.input_dims,
+            name=f'{self.env_name}_{self.algo}_q_eval',
+            chkpt_dir=self.chkpt_dir,
+        )
+        self.q_next = DeepQNetwork(
+            self.lr,
+            self.n_actions,
+            input_dims=self.input_dims,
+            name=f'{self.env_name}_{self.algo}_q_next',
+            chkpt_dir=self.chkpt_dir,
+        )
 
     def choose_action(self, observation):
-        if np.random.random() > self.epsilon:
-            state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
-            actions = self.q_eval.forward(state)
-            action = T.argmax(actions).item()
-        else:
-            action = np.random.choice(self.action_space)
+        if np.random.random() <= self.epsilon:
+            return np.random.choice(self.action_space)
 
-        return action
+        state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
+        actions = self.q_eval.forward(state)
+        return T.argmax(actions).item()
 
     def learn(self):
         if self.memory.mem_cntr < self.batch_size:
@@ -112,24 +116,28 @@ class DDQNAgent(Agent):
     def __init__(self, *args, **kwargs):
         super(DDQNAgent, self).__init__(*args, **kwargs)
 
-        self.q_eval = DeepQNetwork(self.lr, self.n_actions,
-                                    input_dims=self.input_dims,
-                                    name=self.env_name+'_'+self.algo+'_q_eval',
-                                    chkpt_dir=self.chkpt_dir)
-        self.q_next = DeepQNetwork(self.lr, self.n_actions,
-                                    input_dims=self.input_dims,
-                                    name=self.env_name+'_'+self.algo+'_q_next',
-                                    chkpt_dir=self.chkpt_dir)
+        self.q_eval = DeepQNetwork(
+            self.lr,
+            self.n_actions,
+            input_dims=self.input_dims,
+            name=f'{self.env_name}_{self.algo}_q_eval',
+            chkpt_dir=self.chkpt_dir,
+        )
+        self.q_next = DeepQNetwork(
+            self.lr,
+            self.n_actions,
+            input_dims=self.input_dims,
+            name=f'{self.env_name}_{self.algo}_q_next',
+            chkpt_dir=self.chkpt_dir,
+        )
 
     def choose_action(self, observation):
-        if np.random.random() > self.epsilon:
-            state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
-            actions = self.q_eval.forward(state)
-            action = T.argmax(actions).item()
-        else:
-            action = np.random.choice(self.action_space)
+        if np.random.random() <= self.epsilon:
+            return np.random.choice(self.action_space)
 
-        return action
+        state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
+        actions = self.q_eval.forward(state)
+        return T.argmax(actions).item()
 
     def learn(self):
         if self.memory.mem_cntr < self.batch_size:
@@ -162,24 +170,28 @@ class DuelingDQNAgent(Agent):
     def __init__(self, *args, **kwargs):
         super(DuelingDQNAgent, self).__init__(*args, **kwargs)
 
-        self.q_eval = DuelingDeepQNetwork(self.lr, self.n_actions,
-                        input_dims=self.input_dims,
-                        name=self.env_name+'_'+self.algo+'_q_eval',
-                        chkpt_dir=self.chkpt_dir)
-        self.q_next = DuelingDeepQNetwork(self.lr, self.n_actions,
-                        input_dims=self.input_dims,
-                        name=self.env_name+'_'+self.algo+'_q_next',
-                        chkpt_dir=self.chkpt_dir)
+        self.q_eval = DuelingDeepQNetwork(
+            self.lr,
+            self.n_actions,
+            input_dims=self.input_dims,
+            name=f'{self.env_name}_{self.algo}_q_eval',
+            chkpt_dir=self.chkpt_dir,
+        )
+        self.q_next = DuelingDeepQNetwork(
+            self.lr,
+            self.n_actions,
+            input_dims=self.input_dims,
+            name=f'{self.env_name}_{self.algo}_q_next',
+            chkpt_dir=self.chkpt_dir,
+        )
 
     def choose_action(self, observation):
-        if np.random.random() > self.epsilon:
-            state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
-            _, advantage = self.q_eval.forward(state)
-            action = T.argmax(advantage).item()
-        else:
-            action = np.random.choice(self.action_space)
+        if np.random.random() <= self.epsilon:
+            return np.random.choice(self.action_space)
 
-        return action
+        state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
+        _, advantage = self.q_eval.forward(state)
+        return T.argmax(advantage).item()
 
     def learn(self):
         if self.memory.mem_cntr < self.batch_size:
@@ -214,24 +226,28 @@ class DuelingDDQNAgent(Agent):
     def __init__(self, *args, **kwargs):
         super(DuelingDDQNAgent, self).__init__(*args, **kwargs)
 
-        self.q_eval = DuelingDeepQNetwork(self.lr, self.n_actions,
-                        input_dims=self.input_dims,
-                        name=self.env_name+'_'+self.algo+'_q_eval',
-                        chkpt_dir=self.chkpt_dir)
-        self.q_next = DuelingDeepQNetwork(self.lr, self.n_actions,
-                        input_dims=self.input_dims,
-                        name=self.env_name+'_'+self.algo+'_q_next',
-                        chkpt_dir=self.chkpt_dir)
+        self.q_eval = DuelingDeepQNetwork(
+            self.lr,
+            self.n_actions,
+            input_dims=self.input_dims,
+            name=f'{self.env_name}_{self.algo}_q_eval',
+            chkpt_dir=self.chkpt_dir,
+        )
+        self.q_next = DuelingDeepQNetwork(
+            self.lr,
+            self.n_actions,
+            input_dims=self.input_dims,
+            name=f'{self.env_name}_{self.algo}_q_next',
+            chkpt_dir=self.chkpt_dir,
+        )
 
     def choose_action(self, observation):
-        if np.random.random() > self.epsilon:
-            state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
-            _, advantage = self.q_eval.forward(state)
-            action = T.argmax(advantage).item()
-        else:
-            action = np.random.choice(self.action_space)
+        if np.random.random() <= self.epsilon:
+            return np.random.choice(self.action_space)
 
-        return action
+        state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
+        _, advantage = self.q_eval.forward(state)
+        return T.argmax(advantage).item()
 
     def learn(self):
         if self.memory.mem_cntr < self.batch_size:

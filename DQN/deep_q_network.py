@@ -41,9 +41,7 @@ class DeepQNetwork(nn.Module):
         conv_state = conv3.view(conv3.size()[0], -1)
         # conv_state shape is BS x (n_filters * H * W)
         flat1 = F.relu(self.fc1(conv_state))
-        actions = self.fc2(flat1)
-
-        return actions
+        return self.fc2(flat1)
 
     def save_checkpoint(self):
         print('... saving checkpoint ...')
